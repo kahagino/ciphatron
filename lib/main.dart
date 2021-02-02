@@ -28,12 +28,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _userCitation;
-  int _currentValue = 0;
+  String _quote;
+  int _minPswdSize = 0;
 
-  void _setUserCitation(String citation) {
-    _userCitation = citation;
-    print("user citation set to: $_userCitation");
+  void _setQuote(String quote) {
+    _quote = quote;
+    print("user citation set to: $_quote");
   }
 
   @override
@@ -42,32 +42,53 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Input citation',
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Quote',
+                ),
+                onSubmitted: (String text) {
+                  _setQuote(text);
+                },
               ),
-              onSubmitted: (String text) {
-                _setUserCitation(text);
-              },
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                NumberPicker.integer(
-                    initialValue: _currentValue,
-                    minValue: 0,
-                    maxValue: 100,
-                    onChanged: (newValue) =>
-                        setState(() => _currentValue = newValue)),
-                Text("Minimum output size: $_currentValue"),
-              ],
-            ),
-          ],
+              SizedBox(
+                height: 10.0,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Numbers',
+                ),
+                onSubmitted: (String text) {
+                  _setQuote(text);
+                },
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  NumberPicker.integer(
+                      initialValue: _minPswdSize,
+                      minValue: 0,
+                      maxValue: 100,
+                      onChanged: (newValue) =>
+                          setState(() => _minPswdSize = newValue)),
+                  Text("Minimum output size: $_minPswdSize"),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  print("Generate button pressed");
+                },
+                child: Text("Generate"),
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
