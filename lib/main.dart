@@ -28,12 +28,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _quote;
+  List<String> _words; // base words to generate the password letters
+  List<String> _numbers; // user numbers to insert in the final password
   int _minPswdSize = 0;
 
-  void _setQuote(String quote) {
-    _quote = quote;
-    print("user citation set to: $_quote");
+  void _setWords(String quote) {
+    String filteredQuote = quote.replaceAll(RegExp(r"[^\s\w]"), "");
+    _words = filteredQuote.toLowerCase().split(" ");
+    print("words set to: $_words");
+  }
+
+  void _setNumbers(String rawNumbers) {
+    _numbers = rawNumbers.split("");
+    print("numbers set to: $_numbers");
+  }
+
+  void _generate() {
+    for (int i = 0; i < _words.length; i++) {
+      print(_words[i][0]);
+    }
   }
 
   @override
@@ -48,25 +61,30 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Quote',
-                ),
-                onSubmitted: (String text) {
-                  _setQuote(text);
-                },
-              ),
+              Text("Accents and punctuation will be filtered. Keep it simple."),
               SizedBox(
                 height: 10.0,
               ),
               TextField(
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Numbers',
+                  labelText: 'Quote',
                 ),
                 onSubmitted: (String text) {
-                  _setQuote(text);
+                  _setWords(text);
+                },
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Numbers',
+                ),
+                onSubmitted: (String digitText) {
+                  _setNumbers(digitText);
                 },
               ),
               Column(
@@ -78,12 +96,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       maxValue: 100,
                       onChanged: (newValue) =>
                           setState(() => _minPswdSize = newValue)),
-                  Text("Minimum output size: $_minPswdSize"),
+                  Text("Minimum password size: $_minPswdSize"),
                 ],
               ),
               ElevatedButton(
                 onPressed: () {
-                  print("Generate button pressed");
+                  _generate();
                 },
                 child: Text("Generate"),
               ),
