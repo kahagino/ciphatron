@@ -44,9 +44,31 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _generate() {
+    Map lOccurrences = _getFirstLetterOccurrences();
+    print(lOccurrences);
+
     for (int i = 0; i < _words.length; i++) {
       print(_words[i][0]);
     }
+  }
+
+  bool matchNumbersLength(Map occurrences) {
+    // TODO: check if possible to insert numbers if more than two occurrences
+    occurrences.forEach((letter, nbOccurrences) {});
+  }
+
+  Map _getFirstLetterOccurrences() {
+    Map occurrences = Map();
+
+    _words.forEach((word) {
+      if (!occurrences.containsKey(word[0])) {
+        occurrences[word[0]] = 1;
+      } else {
+        occurrences[word[0]] += 1;
+      }
+    });
+
+    return occurrences;
   }
 
   @override
@@ -56,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
