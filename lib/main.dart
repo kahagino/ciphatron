@@ -46,18 +46,24 @@ class _MyHomePageState extends State<MyHomePage> {
     print("numbers set to: $_numbers");
   }
 
-  void _generate() {
+  void _generate() async {
     _setWords(_quoteController.text);
     _setNumbers(_numbersController.text);
 
     Map lOccurrences = _getFirstLetterOccurrences();
     print(lOccurrences);
 
-    for (int i = 0; i < _words.length; i++) {
-      print(_words[i][0]);
-    }
+    List<String> letterPairs = _getPairs(lOccurrences);
+    String pswd = getCustomPassword(letterPairs);
 
-    matchNumbersLength(lOccurrences);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(pswd),
+        );
+      },
+    );
   }
 
   Map _getFirstLetterOccurrences() {
@@ -74,12 +80,31 @@ class _MyHomePageState extends State<MyHomePage> {
     return occurrences;
   }
 
-  bool matchNumbersLength(Map occurrences) {
-    int nbPairs = 0;
-    // TODO: check if possible to insert numbers if more than two occurrences
+  List<String> _getPairs(Map occurrences) {
+    List<String> pairs = [];
     occurrences.forEach((letter, nbOccurrences) {
-      if (nbOccurrences > 2) print("d");
+      if (nbOccurrences >= 2) pairs.add(letter);
     });
+
+    return pairs;
+  }
+
+  String getCustomPassword(List<String> letterPairs) {
+    String pswd = "";
+    int insertNumber = 0;
+    bool nextIsUpper = false; // first letter is lower case
+    for (int i = 0; i < _words.length; i++) {
+      String letter = _words[i][0];
+      pswd += nextIsUpper ? letter.toUpperCase() : letter;
+      nextIsUpper = false;
+      if (letterPairs.contains(letter) && insertNumber < _numbers.length) {
+        pswd += _numbers[insertNumber];
+        insertNumber++;
+        nextIsUpper = true;
+      }
+    }
+
+    return pswd;
   }
 
   void initState() {
@@ -106,7 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text(_quoteController.text),
               Text("Accents and punctuation will be filtered. Keep it simple."),
               SizedBox(
                 height: 10.0,
@@ -142,6 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   Text("Minimum password size: $_minPswdSize"),
                   NumberPicker.integer(
+                      itemExtent: 30.0,
                       infiniteLoop: true,
                       initialValue: _minPswdSize,
                       minValue: 0,
