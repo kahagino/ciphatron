@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print(lOccurrences);
 
     List<String> letterPairs = _getPairs(lOccurrences);
-    String pswd = getCustomPassword(letterPairs);
+    String pswd = _getCustomPassword(letterPairs);
 
     showDialog(
       context: context,
@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return pairs;
   }
 
-  String getCustomPassword(List<String> letterPairs) {
+  String _getCustomPassword(List<String> letterPairs) {
     String pswd = "";
     int insertNumber = 0;
     bool nextIsUpper = false; // first letter is lower case
