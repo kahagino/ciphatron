@@ -32,6 +32,8 @@ class _MyHomePageState extends State<MyHomePage> {
   List<String> _words; // base words to generate the password letters
   List<String> _numbers; // user numbers to insert in the final password
   int _minPswdSize = 0;
+  TextEditingController _quoteController;
+  TextEditingController _numbersController;
 
   void _setWords(String quote) {
     String filteredQuote = quote.replaceAll(RegExp(r"[^\s\w]"), "");
@@ -45,19 +47,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _generate() {
+    _setWords(_quoteController.text);
+    _setNumbers(_numbersController.text);
+
     Map lOccurrences = _getFirstLetterOccurrences();
     print(lOccurrences);
 
     for (int i = 0; i < _words.length; i++) {
       print(_words[i][0]);
     }
-  }
 
-  bool matchNumbersLength(Map occurrences) {
-    // TODO: check if possible to insert numbers if more than two occurrences
-    occurrences.forEach((letter, nbOccurrences) {
-      if (nbOccurrences > 2) print("d");
-    });
+    matchNumbersLength(lOccurrences);
   }
 
   Map _getFirstLetterOccurrences() {
@@ -74,6 +74,26 @@ class _MyHomePageState extends State<MyHomePage> {
     return occurrences;
   }
 
+  bool matchNumbersLength(Map occurrences) {
+    int nbPairs = 0;
+    // TODO: check if possible to insert numbers if more than two occurrences
+    occurrences.forEach((letter, nbOccurrences) {
+      if (nbOccurrences > 2) print("d");
+    });
+  }
+
+  void initState() {
+    super.initState();
+    _quoteController = TextEditingController();
+    _numbersController = TextEditingController();
+  }
+
+  void dispose() {
+    _quoteController.dispose();
+    _numbersController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,23 +106,23 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Text(_quoteController.text),
               Text("Accents and punctuation will be filtered. Keep it simple."),
               SizedBox(
                 height: 10.0,
               ),
               TextField(
+                controller: _quoteController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Quote',
                 ),
-                onSubmitted: (String text) {
-                  _setWords(text);
-                },
               ),
               SizedBox(
                 height: 10.0,
               ),
               TextField(
+                controller: _numbersController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
@@ -120,13 +140,14 @@ class _MyHomePageState extends State<MyHomePage> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Text("Minimum password size: $_minPswdSize"),
                   NumberPicker.integer(
+                      infiniteLoop: true,
                       initialValue: _minPswdSize,
                       minValue: 0,
-                      maxValue: 100,
+                      maxValue: 20,
                       onChanged: (newValue) =>
                           setState(() => _minPswdSize = newValue)),
-                  Text("Minimum password size: $_minPswdSize"),
                 ],
               ),
               ElevatedButton(
