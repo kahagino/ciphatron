@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 void main() {
@@ -54,7 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool matchNumbersLength(Map occurrences) {
     // TODO: check if possible to insert numbers if more than two occurrences
-    occurrences.forEach((letter, nbOccurrences) {});
+    occurrences.forEach((letter, nbOccurrences) {
+      if (nbOccurrences > 2) print("d");
+    });
   }
 
   Map _getFirstLetterOccurrences() {
@@ -105,6 +108,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   border: OutlineInputBorder(),
                   labelText: 'Numbers',
                 ),
+                maxLength: 4,
+                maxLengthEnforced: true,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
+                ],
                 onSubmitted: (String digitText) {
                   _setNumbers(digitText);
                 },
