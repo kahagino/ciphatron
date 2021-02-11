@@ -9,10 +9,14 @@ complicated passwords that you can easily remember.
 
 > 3678
 
-👉 `T3Y6PlY7t8Ganoesm`
+👉 `t3Y6Ply7T8Ganoesm`
 
 ## How does it work ?
 
 It gets every first letter of the quote, search for any recurrent letter and
 inserts the number you provided. So you only have to remember your favorite
 quote and number to have a very strong password 🔒.
+
+## Preview
+
+![Screenshot 1](preview/screenshot1.png)
