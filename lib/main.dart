@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -60,7 +61,19 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          content: Text(pswd),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(pswd),
+              IconButton(
+                icon: Icon(Icons.copy),
+                onPressed: () {
+                  Clipboard.setData(new ClipboardData(text: pswd));
+                  Navigator.pop(context); // hide current dialog
+                },
+              )
+            ],
+          ),
         );
       },
     );
