@@ -136,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(widget.title),
       ),
       body: Padding(
@@ -144,11 +145,13 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text("Accents and punctuation will be filtered. Keep it simple."),
+              Text("Enter your favorite quote and number"),
               SizedBox(
                 height: 10.0,
               ),
               TextField(
+                minLines: 1,
+                maxLines: 4,
                 controller: _quoteController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
@@ -163,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Numbers',
+                  labelText: 'Number',
                 ),
                 maxLength: 4,
                 maxLengthEnforced: true,
@@ -174,32 +177,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   _setNumbers(digitText);
                 },
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text("Minimum password size: $_minPswdSize"),
-                  NumberPicker.integer(
-                      itemExtent: 30.0,
-                      infiniteLoop: true,
-                      initialValue: _minPswdSize,
-                      minValue: 0,
-                      maxValue: 20,
-                      onChanged: (newValue) =>
-                          setState(() => _minPswdSize = newValue)),
-                ],
-              ),
               ElevatedButton(
                 onPressed: () {
                   _generate();
                 },
-                child: Text("Generate"),
+                child: Text("Generate password"),
               ),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          // TODO: restart with fresh ui
+        },
         tooltip: 'New',
         child: Icon(Icons.fiber_new),
       ),
