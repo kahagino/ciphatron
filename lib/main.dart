@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:numberpicker/numberpicker.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:ciphatron/pswd_gen.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,8 +14,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ciphatron',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        textTheme: GoogleFonts.robotoMonoTextTheme(
+          Theme.of(context).textTheme,
+        ),
+        brightness: Brightness.light,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        accentColor: Colors.blue,
+      ),
+      themeMode: ThemeMode.system,
       home: MyHomePage(title: 'Ciphatron'),
     );
   }
@@ -30,105 +39,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> _words; // base words to generate the password letters
-  List<String> _numbers; // user numbers to insert in the final password
-  int _minPswdSize = 0;
-  TextEditingController _quoteController;
-  TextEditingController _numbersController;
-
-  void _setWords(String quote) {
-    String filteredQuote = quote.replaceAll(RegExp(r"[^\s\w]"), "");
-    _words = filteredQuote.toLowerCase().split(" ");
-    print("words set to: $_words");
-  }
-
-  void _setNumbers(String rawNumbers) {
-    _numbers = rawNumbers.split("");
-    print("numbers set to: $_numbers");
-  }
-
-  void _generate() async {
-    _setWords(_quoteController.text);
-    _setNumbers(_numbersController.text);
-
-    Map lOccurrences = _getFirstLetterOccurrences();
-    print(lOccurrences);
-
-    List<String> letterPairs = _getPairs(lOccurrences);
-    String pswd = _getCustomPassword(letterPairs);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(pswd),
-              IconButton(
-                icon: Icon(Icons.copy),
-                onPressed: () {
-                  Clipboard.setData(new ClipboardData(text: pswd));
-                  Navigator.pop(context); // hide current dialog
-                },
-              )
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Map _getFirstLetterOccurrences() {
-    Map occurrences = Map();
-
-    _words.forEach((word) {
-      if (!occurrences.containsKey(word[0])) {
-        occurrences[word[0]] = 1;
-      } else {
-        occurrences[word[0]] += 1;
-      }
-    });
-
-    return occurrences;
-  }
-
-  List<String> _getPairs(Map occurrences) {
-    List<String> pairs = [];
-    occurrences.forEach((letter, nbOccurrences) {
-      if (nbOccurrences >= 2) pairs.add(letter);
-    });
-
-    return pairs;
-  }
-
-  String _getCustomPassword(List<String> letterPairs) {
-    String pswd = "";
-    int insertNumber = 0;
-    bool nextIsUpper = false; // first letter is lower case
-    for (int i = 0; i < _words.length; i++) {
-      String letter = _words[i][0];
-      pswd += nextIsUpper ? letter.toUpperCase() : letter;
-      nextIsUpper = false;
-      if (letterPairs.contains(letter) && insertNumber < _numbers.length) {
-        pswd += _numbers[insertNumber];
-        insertNumber++;
-        nextIsUpper = true;
-      }
-    }
-
-    return pswd;
-  }
+  PswdGen pGen;
 
   void initState() {
     super.initState();
-    _quoteController = TextEditingController();
-    _numbersController = TextEditingController();
+    pGen = PswdGen();
   }
 
   void dispose() {
-    _quoteController.dispose();
-    _numbersController.dispose();
+    pGen.dispose();
     super.dispose();
   }
 
@@ -145,24 +64,37 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Text("Enter your favorite quote and number"),
+              Text(
+                "Enter your favorite quote and number",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 24),
+              ),
               SizedBox(
-                height: 10.0,
+                height: 16.0,
+              ),
+              Text(
+                "Ciphatron handles the rest",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(
+                height: 34.0,
               ),
               TextField(
                 minLines: 1,
                 maxLines: 4,
-                controller: _quoteController,
+                controller: pGen.quoteController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Quote',
                 ),
+                // TODO: add input formater for \n
               ),
               SizedBox(
-                height: 10.0,
+                height: 14.0,
               ),
               TextField(
-                controller: _numbersController,
+                controller: pGen.numbersController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
@@ -173,15 +105,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp("[0-9]")),
                 ],
-                onSubmitted: (String digitText) {
-                  _setNumbers(digitText);
-                },
               ),
               ElevatedButton(
                 onPressed: () {
-                  _generate();
+                  pGen.generate(context);
                 },
-                child: Text("Generate password"),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 18.0),
+                  child: Text(
+                    "Generate password",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
               ),
             ],
           ),
@@ -189,11 +124,19 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: restart with fresh ui
+          setState(() {
+            pGen.quoteController.clear();
+            pGen.numbersController.clear();
+          });
+
+          // clear focus
+          FocusScope.of(context).requestFocus(FocusNode());
         },
         tooltip: 'New',
-        child: Icon(Icons.fiber_new),
+        child: Icon(Icons.delete),
       ),
     );
   }
+
+  double get newMethod => 18;
 }
