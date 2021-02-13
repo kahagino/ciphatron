@@ -20,6 +20,9 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
+        textTheme: GoogleFonts.robotoMonoTextTheme(
+          Theme.of(context).textTheme,
+        ),
         brightness: Brightness.dark,
         accentColor: Colors.blue,
       ),
