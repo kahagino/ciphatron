@@ -140,6 +140,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  double get newMethod => 18;
 }
