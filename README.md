@@ -30,8 +30,8 @@ you have to type the 4 digits, like a pin code 1️⃣2️⃣3️⃣4️⃣
 
 ## Preview
 
-![Screenshot 1](preview/screenshot_1.png)
-![Screenshot 12](preview/screenshot_12.png)
-![Screenshot 2](preview/screenshot_2.png)
-![Screenshot 3](preview/screenshot_3.png)
-![Screenshot 4](preview/screenshot_4.png)
+![Screenshot 1](preview/Screenshot_1.png)
+![Screenshot 12](preview/Screenshot_12.png)
+![Screenshot 2](preview/Screenshot_2.png)
+![Screenshot 3](preview/Screenshot_3.png)
+![Screenshot 4](preview/Screenshot_4.png)
