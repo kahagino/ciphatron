@@ -49,7 +49,7 @@ class _GenerateMenuState extends State<GenerateMenu> {
               height: 16.0,
             ),
             Text(
-              "Repetitive patterns works best:\nTo Be or not To Be",
+              "Repetitive patterns work best:\nTo Be or not To Be",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),

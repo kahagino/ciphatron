@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:ciphatron/components/generate_menu.dart';
 import 'package:ciphatron/global.dart';
@@ -17,17 +16,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ciphatron',
       theme: ThemeData(
-        textTheme: GoogleFonts.robotoMonoTextTheme(
-          Theme.of(context).textTheme,
-        ),
         brightness: Brightness.light,
+        accentColor: Colors.blue,
       ),
       darkTheme: ThemeData(
-        textTheme: GoogleFonts.robotoMonoTextTheme(
-          Theme.of(context).textTheme,
-        ),
-        brightness: Brightness.dark,
         accentColor: Colors.blue,
+        cardColor: Colors.blue,
+        brightness: Brightness.dark,
+        canvasColor: Color(0xff341f97),
+        dialogBackgroundColor: Colors.black,
       ),
       themeMode: ThemeMode.system,
       home: MyHomePage(title: 'Ciphatron'),
@@ -79,10 +76,13 @@ class _MyHomePageState extends State<MyHomePage> {
       minHeight: _panelHeightClosed,
       borderRadius: radius,
       controller: _pc,
+      backdropEnabled: true,
+      color: Theme.of(context).dialogBackgroundColor,
       panelBuilder: (ScrollController sc) => _scrollingList(sc, pGen),
       collapsed: Container(
         decoration: BoxDecoration(
-            color: Theme.of(context).canvasColor, borderRadius: radius),
+            color: Theme.of(context).dialogBackgroundColor,
+            borderRadius: radius),
         child: Center(
           child: Column(
             children: [
@@ -112,6 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
             bottom: _fabHeight,
             child: FloatingActionButton(
               onPressed: () {
+                _pc.close();
                 setState(() {
                   pGen.quoteController.clear();
                   pGen.numbersController.clear();
@@ -142,7 +143,7 @@ Widget _scrollingList(ScrollController sc, PswdGen pGen) {
         onDismissed: (DismissDirection dir) {
           global.quotesMngr.onUserDismiss(i);
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("$item dismissed")));
+              .showSnackBar(SnackBar(content: Text("Quote dismissed")));
         },
         background: Container(
           color: Colors.red,
@@ -151,13 +152,15 @@ Widget _scrollingList(ScrollController sc, PswdGen pGen) {
             color: Colors.white,
           ),
         ),
-        child: ListTile(
-          onTap: () {
-            pGen.quoteController.text = item;
-            global.quotesMngr.onUserLoad(); // update favorite
-            _pc.close(); // slide down panel
-          },
-          title: Text(item),
+        child: Card(
+          child: ListTile(
+            onTap: () {
+              pGen.quoteController.text = item;
+              global.quotesMngr.onUserLoad(); // update favorite
+              _pc.close(); // slide down panel
+            },
+            title: Text(item),
+          ),
         ),
       );
     },
