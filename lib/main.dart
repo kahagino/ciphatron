@@ -52,9 +52,17 @@ class _MyHomePageState extends State<MyHomePage> {
   double _panelHeightOpen;
   double _panelHeightClosed = 95.0;
 
+  bool showEmptyList;
+
   void initState() {
     super.initState();
     pGen = PswdGen();
+    showEmptyList = global.quotesMngr.isEmpty();
+    global.quotesMngr.addListener(() {
+      setState(() {
+        showEmptyList = global.quotesMngr.isEmpty();
+      });
+    });
     _fabHeight = _initFabHeight;
   }
 
@@ -95,6 +103,22 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+      panel: showEmptyList // override panelBuilder when list is empty
+          ? Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Add quotes with the ",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Icon(
+                    Icons.favorite_border,
+                  ),
+                ],
+              ),
+            )
+          : null, // allows panelBuilder to be drawn
       body: GenerateMenu(pGen: pGen),
       onPanelSlide: (double pos) => setState(() {
         _fabHeight =
