@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ciphatron/utils.dart';
 
 class PswdGen {
   List<String> _words; // base words to generate the password letters
@@ -22,8 +23,7 @@ class PswdGen {
   }
 
   void _setWords(String quote) {
-    String filteredQuote = quote.replaceAll(RegExp(r"[^\s\w]"), "");
-    _words = filteredQuote.toLowerCase().split(" ");
+    _words = getFilteredQuote(quote).split(" ");
     print("words set to: $_words");
   }
 
@@ -73,6 +73,10 @@ class PswdGen {
     return pswd;
   }
 
+  String getCurrentQuote() {
+    return _quoteController.text;
+  }
+
   void generate(final BuildContext context) async {
     _setWords(_quoteController.text);
     _setNumbers(_numbersController.text);
@@ -91,14 +95,14 @@ class PswdGen {
           content: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(pswd),
+              Expanded(child: Text(pswd)),
               IconButton(
                 icon: Icon(Icons.copy),
                 onPressed: () {
                   Clipboard.setData(new ClipboardData(text: pswd));
                   Navigator.pop(context); // hide current dialog
                 },
-              )
+              ),
             ],
           ),
         );

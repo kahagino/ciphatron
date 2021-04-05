@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:ciphatron/components/generate_menu.dart';
+import 'package:ciphatron/global.dart';
 import 'package:ciphatron/pswd_gen.dart';
 
 void main() {
@@ -41,12 +44,21 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+PanelController _pc = new PanelController();
+
 class _MyHomePageState extends State<MyHomePage> {
   PswdGen pGen;
+
+  // floating button variables to make it follow panel movement
+  final double _initFabHeight = 120.0;
+  double _fabHeight;
+  double _panelHeightOpen;
+  double _panelHeightClosed = 95.0;
 
   void initState() {
     super.initState();
     pGen = PswdGen();
+    _fabHeight = _initFabHeight;
   }
 
   void dispose() {
@@ -56,88 +68,98 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(widget.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
+    _panelHeightOpen = MediaQuery.of(context).size.height * .80;
+    BorderRadiusGeometry radius = BorderRadius.only(
+      topLeft: Radius.circular(24.0),
+      topRight: Radius.circular(24.0),
+    );
+
+    SlidingUpPanel slidingUpPanel = SlidingUpPanel(
+      maxHeight: _panelHeightOpen,
+      minHeight: _panelHeightClosed,
+      borderRadius: radius,
+      controller: _pc,
+      panelBuilder: (ScrollController sc) => _scrollingList(sc, pGen),
+      collapsed: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).canvasColor, borderRadius: radius),
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "Enter your favorite quote and number",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24),
+            children: [
+              Icon(
+                Icons.horizontal_rule,
+                size: 32,
               ),
-              SizedBox(
-                height: 16.0,
-              ),
-              Text(
-                "Ciphatron handles the rest",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(
-                height: 34.0,
-              ),
-              TextField(
-                minLines: 1,
-                maxLines: 4,
-                controller: pGen.quoteController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Quote',
-                ),
-                // TODO: add input formater for \n
-              ),
-              SizedBox(
-                height: 14.0,
-              ),
-              TextField(
-                controller: pGen.numbersController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Number',
-                ),
-                maxLength: 4,
-                maxLengthEnforced: true,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  pGen.generate(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 18.0),
-                  child: Text(
-                    "Generate password",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-              ),
+              Text("Favorites"),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            pGen.quoteController.clear();
-            pGen.numbersController.clear();
-          });
+      body: GenerateMenu(pGen: pGen),
+      onPanelSlide: (double pos) => setState(() {
+        _fabHeight =
+            pos * (_panelHeightOpen - _panelHeightClosed) + _initFabHeight;
+      }),
+    );
 
-          // clear focus
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        tooltip: 'New',
-        child: Icon(Icons.delete),
+    return Scaffold(
+      resizeToAvoidBottomInset: false, // prevent panel to follow keyboard
+      body: Stack(
+        children: [
+          slidingUpPanel,
+          Positioned(
+            right: 20.0,
+            bottom: _fabHeight,
+            child: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  pGen.quoteController.clear();
+                  pGen.numbersController.clear();
+                  global.quotesMngr.onCurrentQuoteChanged("");
+                });
+
+                // clear focus
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+              tooltip: 'Refresh',
+              child: Icon(Icons.refresh),
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+Widget _scrollingList(ScrollController sc, PswdGen pGen) {
+  return ListView.builder(
+    controller: sc,
+    itemCount: global.quotesMngr.size(),
+    itemBuilder: (BuildContext context, int i) {
+      final item = global.quotesMngr.get(i);
+      return Dismissible(
+        key: Key(item),
+        onDismissed: (DismissDirection dir) {
+          global.quotesMngr.onUserDismiss(i);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text("$item dismissed")));
+        },
+        background: Container(
+          color: Colors.red,
+          child: Icon(
+            Icons.delete_forever,
+            color: Colors.white,
+          ),
+        ),
+        child: ListTile(
+          onTap: () {
+            pGen.quoteController.text = item;
+            global.quotesMngr.onUserLoad(); // update favorite
+            _pc.close(); // slide down panel
+          },
+          title: Text(item),
+        ),
+      );
+    },
+  );
 }
