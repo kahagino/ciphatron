@@ -14,6 +14,7 @@ class QuotesMngr with ChangeNotifier {
       print("Quotes read:");
       print(value);
       _quotes = value;
+      notifyListeners();
     });
   }
 
@@ -51,8 +52,8 @@ class QuotesMngr with ChangeNotifier {
       }
       return quotesList;
     } catch (e) {
-      // If encountering an error, return 0.
-      return ["An error occured while reading file"];
+      // If encountering an error, return [].
+      return [];
     }
   }
 
