@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
       statusBarColor: Colors.transparent,
     ));
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Ciphatron',
       theme: ThemeData(
         brightness: Brightness.light,
