@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -13,6 +14,9 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ));
     return MaterialApp(
       title: 'Ciphatron',
       theme: ThemeData(
@@ -56,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void initState() {
     super.initState();
+
     pGen = PswdGen();
     showEmptyList = global.quotesMngr.isEmpty();
     global.quotesMngr.addListener(() {
