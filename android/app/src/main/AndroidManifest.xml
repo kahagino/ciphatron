@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ciphatron">
+    package="com.leopnt.ciphatron">
    <application
         android:label="Ciphatron"
         android:icon="@mipmap/ic_launcher">
