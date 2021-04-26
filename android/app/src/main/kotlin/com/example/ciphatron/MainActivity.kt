@@ -1,4 +1,4 @@
-package com.example.ciphatron
+package com.leopnt.ciphatron
 
 import io.flutter.embedding.android.FlutterActivity
 
